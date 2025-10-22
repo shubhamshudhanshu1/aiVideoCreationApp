@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import { Home, Plus, Library, User } from "lucide-react";
 
 export const metadata = {
   title: "AI Video",
@@ -12,50 +13,94 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        <header className="sticky top-0 z-40 bg-bg/80 backdrop-blur border-b border-black/10">
-          <div className="mx-auto max-w-5xl px-4 h-14 flex items-center justify-between">
-            <Link href="/" className="font-semibold">
+    <html lang="en" className="h-full">
+      <body className="h-full flex flex-col bg-bg text-ink overflow-hidden">
+        {/* Fixed Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-b border-black/10 shadow-sm">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <Link
+              href="/"
+              className="font-bold text-xl text-ink hover:text-ink/80 transition-colors"
+            >
               AI Video
             </Link>
-            <nav className="hidden sm:flex gap-2">
-              <Link className="chip" href="/">
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+              <Link
+                className="chip hover:bg-black/10 transition-colors"
+                href="/"
+              >
                 Explore
               </Link>
-              <Link className="chip" href="/create">
+              <Link
+                className="chip hover:bg-black/10 transition-colors"
+                href="/create"
+              >
                 Create
               </Link>
-              <Link className="chip" href="/library">
+              <Link
+                className="chip hover:bg-black/10 transition-colors"
+                href="/library"
+              >
                 Library
               </Link>
-              <Link className="chip" href="/profile/me">
+              <Link
+                className="chip hover:bg-black/10 transition-colors"
+                href="/profile/me"
+              >
                 Profile
               </Link>
             </nav>
-            <Link className="btn" href="/create">
+
+            <Link
+              className="btn hover:opacity-80 transition-opacity"
+              href="/create"
+            >
               Generate
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 mx-auto w-full max-w-5xl px-4 py-6">
-          {children}
+        {/* Main Content Area with Scroll */}
+        <main className="flex-1 flex flex-col pt-16 pb-20 sm:pb-0 overflow-hidden">
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+              {children}
+            </div>
+          </div>
         </main>
 
-        <footer className="sm:hidden sticky bottom-0 bg-bg border-t border-black/10">
-          <nav className="mx-auto max-w-5xl grid grid-cols-4 gap-1 p-2 text-xs">
-            <Link href="/" className="chip text-center">
-              Home
+        {/* Fixed Footer for Mobile */}
+        <footer className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-t border-black/10 shadow-lg">
+          <nav className="mx-auto max-w-7xl px-4 grid grid-cols-4 gap-1 py-2">
+            <Link
+              href="/"
+              className="text-center flex flex-col items-center gap-1 py-3 hover:bg-black/10 transition-colors rounded-lg"
+            >
+              <Home size={20} />
+              <span className="text-xs font-medium">Home</span>
             </Link>
-            <Link href="/create" className="chip text-center">
-              Create
+            <Link
+              href="/create"
+              className="text-center flex flex-col items-center gap-1 py-3 hover:bg-black/10 transition-colors rounded-lg"
+            >
+              <Plus size={20} />
+              <span className="text-xs font-medium">Create</span>
             </Link>
-            <Link href="/library" className="chip text-center">
-              Library
+            <Link
+              href="/library"
+              className="text-center flex flex-col items-center gap-1 py-3 hover:bg-black/10 transition-colors rounded-lg"
+            >
+              <Library size={20} />
+              <span className="text-xs font-medium">Library</span>
             </Link>
-            <Link href="/profile/me" className="chip text-center">
-              Profile
+            <Link
+              href="/profile/me"
+              className="text-center flex flex-col items-center gap-1 py-3 hover:bg-black/10 transition-colors rounded-lg"
+            >
+              <User size={20} />
+              <span className="text-xs font-medium">Profile</span>
             </Link>
           </nav>
         </footer>

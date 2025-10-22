@@ -5,21 +5,43 @@
 :root {
   color-scheme: light;
 }
+
 body {
   @apply bg-bg text-ink;
 }
+
+/* Hide scrollbars while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+/* Ensure no horizontal scroll */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .btn {
-  @apply inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium shadow-soft bg-ink text-white hover:opacity-90;
+  @apply inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium shadow-soft bg-ink text-white hover:opacity-90 transition-opacity;
 }
 .card {
   @apply bg-card rounded-2xl shadow-soft border border-black/5;
 }
 .iconbtn {
-  @apply p-3 rounded-2xl bg-black/5 hover:bg-black/10;
+  @apply p-3 rounded-2xl bg-black/5 hover:bg-black/10 transition-colors;
 }
 .input {
   @apply w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ink/10;
 }
 .chip {
-  @apply rounded-full px-3 py-1 text-xs border border-black/10 bg-black/5;
+  @apply rounded-full px-3 py-1 text-xs border border-black/10 bg-black/5 hover:bg-black/10 transition-colors;
 }
