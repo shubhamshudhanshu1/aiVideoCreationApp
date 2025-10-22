@@ -81,7 +81,7 @@ export default function FormField({
   };
 
   return (
-    <div>
+    <div className="w-full">
       <label htmlFor={inputId} className="text-sm font-medium">
         {label}
       </label>
