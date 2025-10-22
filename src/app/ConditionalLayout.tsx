@@ -14,8 +14,10 @@ export default function ConditionalLayout({
   const pathname = usePathname();
 
   // Routes that should not have header and footer
-  const noHeaderFooterRoutes = ["/", "/login", "/login/otp"];
-  const shouldShowHeaderFooter = !noHeaderFooterRoutes.includes(pathname);
+  const noHeaderFooterRoutes = ["/", "/login", "/login/otp", "/player"];
+  const shouldShowHeaderFooter =
+    !noHeaderFooterRoutes.includes(pathname) &&
+    !pathname.startsWith("/player/");
 
   return (
     <>
@@ -74,10 +76,16 @@ export default function ConditionalLayout({
           shouldShowHeaderFooter ? "pt-16 pb-20 sm:pb-0" : ""
         } overflow-hidden`}
       >
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div
+          className={`flex-1 ${
+            shouldShowHeaderFooter ? "overflow-y-auto scrollbar-hide" : ""
+          }`}
+        >
           <div
-            className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
-              shouldShowHeaderFooter ? "py-6" : ""
+            className={`${
+              shouldShowHeaderFooter
+                ? "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6"
+                : "h-full w-full"
             }`}
           >
             {children}
