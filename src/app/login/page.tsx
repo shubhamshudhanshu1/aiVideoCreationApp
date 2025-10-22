@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ActionButtons from "@/components/ActionButtons";
 import { Apple, Phone, Mail, Github } from "lucide-react";
 
@@ -7,10 +6,20 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <h1 className="text-2xl font-semibold mb-6">Login to AI Video</h1>
-        <Link href="/login/otp" className="btn w-full justify-center text-lg">
-          <Phone size={16} className="mr-2" />
-          Use my phone number
-        </Link>
+        <ActionButtons
+          primary={{
+            text: "Use my phone number",
+            icon: <Phone size={16} />,
+            iconPosition: "left",
+            href: "/login/otp",
+            variant: "btn",
+            size: "lg",
+            width: "full",
+            textAlign: "center",
+            className: "!justify-center",
+          }}
+          containerClassName="mb-6"
+        />
         <div className="my-6 grid grid-cols-3 items-center text-mute text-xs gap-2">
           <hr />
           <span className="text-center">or</span>

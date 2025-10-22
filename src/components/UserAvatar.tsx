@@ -29,7 +29,7 @@ interface UserAvatarProps {
   }>;
   following?: number;
   followers?: number;
-  className?: string;
+  containerClassName?: string;
 }
 
 export default function UserAvatar({
@@ -42,7 +42,7 @@ export default function UserAvatar({
   actions = [],
   following = 0,
   followers = 0,
-  className = "",
+  containerClassName = "",
 }: UserAvatarProps) {
   const sizeClasses = {
     sm: "h-12 w-12",
@@ -57,7 +57,7 @@ export default function UserAvatar({
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-4 ${containerClassName}`}>
       {/* Main Profile Card */}
       <div className="card p-6">
         <div className="flex items-center gap-4">

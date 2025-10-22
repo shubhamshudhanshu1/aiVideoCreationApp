@@ -10,7 +10,7 @@ interface FormFieldProps {
   min?: number;
   max?: number;
   rows?: number;
-  className?: string;
+  containerClassName?: string;
   required?: boolean;
 }
 
@@ -24,13 +24,13 @@ export default function FormField({
   min,
   max,
   rows = 3,
-  className = "",
+  containerClassName = "",
   required = false,
 }: FormFieldProps) {
   const inputId = `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
   const renderInput = () => {
-    const baseClass = `input ${className}`;
+    const baseClass = `input ${containerClassName}`;
 
     switch (type) {
       case "textarea":

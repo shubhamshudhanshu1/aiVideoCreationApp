@@ -45,7 +45,7 @@ export default function Profile({ params }: { params: { handle: string } }) {
             icon: <Plus size={16} />,
           },
         ]}
-        className="mb-6"
+        containerClassName="mb-6"
       />
 
       <div className="text-sm text-mute mb-2">Songs</div>

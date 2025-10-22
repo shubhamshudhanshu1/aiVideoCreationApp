@@ -1,5 +1,6 @@
 import FormField from "@/components/FormField";
 import ActionButtons from "@/components/ActionButtons";
+import { CheckCircle, Phone } from "lucide-react";
 
 export default function OTP() {
   return (
@@ -22,12 +23,25 @@ export default function OTP() {
             label=""
             type="text"
             placeholder="Input Phone number"
-            className="flex-1"
+            containerClassName="flex-1"
           />
         </div>
         <ActionButtons
-          primary={{ text: "Confirm", variant: "btn" }}
-          className="w-full justify-center mt-6"
+          primary={{
+            text: "Confirm",
+            icon: <CheckCircle size={20} />,
+            iconPosition: "left",
+            variant: "btn",
+            size: "lg",
+            width: "full", // Full width button
+            borderStyle: "solid",
+            borderWidth: "2",
+            borderColor: "blue-500",
+            textAlign: "center", // Center-aligned text
+            className: "!justify-center", // Force center alignment
+          }}
+          containerClassName="mt-6"
+          align="center"
         />
       </div>
     </div>
