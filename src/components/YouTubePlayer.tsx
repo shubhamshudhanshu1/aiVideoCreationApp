@@ -1,6 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  ChevronUp,
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Share,
+  MoreHorizontal,
+  RotateCcw,
+  Edit3,
+  Music,
+} from "lucide-react";
 
 interface YouTubePlayerProps {
   videoId: string;
@@ -86,67 +97,75 @@ export default function YouTubePlayer({
           onClick={onCreateAgain}
           title="Remix"
         >
-          ⟳
+          <RotateCcw size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onLike}
           title="Like"
         >
-          👍
+          <ThumbsUp size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onDislike}
           title="Dislike"
         >
-          👎
+          <ThumbsDown size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onComment}
           title="Comment"
         >
-          💬
+          <MessageCircle size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onShare}
           title="Share"
         >
-          ↗
+          <Share size={20} />
         </button>
       </div>
 
-      {/* Title + author */}
-      <div className="absolute left-4 bottom-44 sm:bottom-48 text-white drop-shadow">
-        <div className="text-2xl font-semibold">{title}</div>
-        <div className="mt-2 flex items-center gap-2 text-sm opacity-90">
-          <div className="h-6 w-6 rounded-full bg-white/30" />
-          <span>@{author}</span>
+      {/* Lower section with video controls */}
+      <section className="absolute left-0 right-0 bottom-0 p-4 gap-2 flex flex-col">
+        {/* Title + author */}
+        <div className="left-4 bottom-44 sm:bottom-48 text-white drop-shadow">
+          <div className="text-2xl font-semibold">{title}</div>
+          <div className="mt-2 flex items-center gap-2 text-sm opacity-90">
+            <div className="h-6 w-6 rounded-full bg-white/30" />
+            <span>@{author}</span>
+          </div>
         </div>
-      </div>
 
-      {/* Primary actions */}
-      <div className="absolute left-4 right-4 bottom-32 flex gap-4">
-        <button
-          className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors"
-          onClick={onCreateAgain}
-        >
-          ♫ Create Again
-        </button>
-        <button
-          className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors"
-          onClick={onEdit}
-        >
-          ✎ Edit
-        </button>
-      </div>
+        {/* Primary actions */}
+        <div className="left-4 right-4 bottom-32 flex gap-4 mb-4">
+          <button
+            className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors flex items-center justify-center gap-2"
+            onClick={onCreateAgain}
+          >
+            <Music size={16} />
+            Create Again
+          </button>
+          <button
+            className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors flex items-center justify-center gap-2"
+            onClick={onEdit}
+          >
+            <Edit3 size={16} />
+            Edit
+          </button>
+        </div>
 
-      {/* See more chevron */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
-        <div className="text-[11px] tracking-wide text-white/80">See More</div>
-      </div>
+        {/* See more chevron */}
+        <div className="bottom-4 left-1/2 -translate-x-1/2 text-center">
+          <button className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors">
+            <ChevronUp size={16} />
+            <span className="text-[11px] tracking-wide">See More</span>
+          </button>
+        </div>
+      </section>
 
       {/* Loading veil when not ready */}
       {!isLoaded && (

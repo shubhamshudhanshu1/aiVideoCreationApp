@@ -1,6 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
+import {
+  ChevronUp,
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircle,
+  Share,
+  MoreHorizontal,
+  RotateCcw,
+  Edit3,
+  Music,
+} from "lucide-react";
 
 /** Props */
 type Props = {
@@ -150,125 +161,131 @@ export default function VideoPlayer({
           onClick={onCreateAgain}
           title="Remix"
         >
-          ⟳
+          <RotateCcw size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onLike}
           title="Like"
         >
-          👍
+          <ThumbsUp size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onDislike}
           title="Dislike"
         >
-          👎
+          <ThumbsDown size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onComment}
           title="Comment"
         >
-          💬
+          <MessageCircle size={20} />
         </button>
         <button
           className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-white/30 transition-colors text-white"
           onClick={onShare}
           title="Share"
         >
-          ↗
+          <Share size={20} />
         </button>
       </div>
 
-      {/* Title + author */}
-      <div className="absolute left-4 bottom-44 sm:bottom-48 text-white drop-shadow">
-        <div className="text-2xl font-semibold">{title}</div>
-        <div className="mt-2 flex items-center gap-2 text-sm opacity-90">
-          <div className="h-6 w-6 rounded-full bg-white/30" />
-          <span>@{author}</span>
+      {/* Lower section with video controls */}
+      <section className="absolute left-0 right-0 bottom-0 p-4 gap-2 flex flex-col">
+        {/* Title + author */}
+        <div className="left-4 bottom-44 sm:bottom-48 text-white drop-shadow">
+          <div className="text-2xl font-semibold">{title}</div>
+          <div className="mt-2 flex items-center gap-2 text-sm opacity-90">
+            <div className="h-6 w-6 rounded-full bg-white/30" />
+            <span>@{author}</span>
+          </div>
         </div>
-      </div>
 
-      {/* Primary actions */}
-      <div className="absolute left-4 right-4 bottom-32 flex gap-4">
-        <button
-          className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors"
-          onClick={onCreateAgain}
-        >
-          ♫ Create Again
-        </button>
-        <button
-          className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors"
-          onClick={onEdit}
-        >
-          ✎ Edit
-        </button>
-      </div>
+        {/* Primary actions */}
+        <div className="left-4 right-4 bottom-32 flex gap-4 mb-4">
+          <button
+            className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors flex items-center justify-center gap-2"
+            onClick={onCreateAgain}
+          >
+            <Music size={16} />
+            Create Again
+          </button>
+          <button
+            className="flex-1 px-6 py-3 rounded-full bg-white/15 text-white backdrop-blur border border-white/20 hover:bg-white/25 transition-colors flex items-center justify-center gap-2"
+            onClick={onEdit}
+          >
+            <Edit3 size={16} />
+            Edit
+          </button>
+        </div>
 
-      {/* Scrubber */}
-      <div className="absolute left-4 right-4 bottom-20">
-        <div
-          className="h-1 w-full bg-white/20 rounded-full cursor-pointer"
-          onClick={handleProgressClick}
-        >
+        {/* Scrubber */}
+        <div className="left-4 right-4 bottom-20">
           <div
-            className="h-1 bg-white rounded-full transition-all duration-200"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
-        <div className="mt-2 flex justify-between text-[11px] text-white/80">
-          <span>{fmt(time)}</span>
-          <span>{fmt(dur)}</span>
-        </div>
-      </div>
-
-      {/* Transport controls */}
-      <div className="absolute left-0 right-0 bottom-6 grid place-items-center gap-3">
-        <div className="flex items-center gap-8 text-white">
-          <button
-            className="h-12 w-12 grid place-items-center rounded-full bg-white/15 border border-white/20 hover:bg-white/25 transition-colors"
-            onClick={() => {
-              const v = videoRef.current;
-              if (!v) return;
-              v.currentTime = Math.max(0, v.currentTime - 5);
-            }}
-            aria-label="Back 5s"
+            className="h-1 w-full bg-white/20 rounded-full cursor-pointer"
+            onClick={handleProgressClick}
           >
-            ◀
-          </button>
-
-          <button
-            className="h-16 w-16 grid place-items-center rounded-full bg-white text-black font-bold hover:bg-white/90 transition-colors"
-            onClick={() => {
-              const v = videoRef.current;
-              if (!v) return;
-              v.paused ? v.play() : v.pause();
-            }}
-            aria-label="Play/Pause"
-          >
-            {playing ? "❚❚" : "▶"}
-          </button>
-
-          <button
-            className="h-12 w-12 grid place-items-center rounded-full bg-white/15 border border-white/20 hover:bg-white/25 transition-colors"
-            onClick={() => {
-              const v = videoRef.current;
-              if (!v || !dur) return;
-              v.currentTime = Math.min(dur, v.currentTime + 5);
-            }}
-            aria-label="Forward 5s"
-          >
-            ▶
-          </button>
+            <div
+              className="h-1 bg-white rounded-full transition-all duration-200"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          <div className="mt-2 flex justify-between text-[11px] text-white/80">
+            <span>{fmt(time)}</span>
+            <span>{fmt(dur)}</span>
+          </div>
         </div>
 
-        {/* See more chevron */}
-        <div className="text-[11px] tracking-wide text-white/80 mt-3">
-          See More
+        {/* Transport controls */}
+        <div className="left-0 right-0 bottom-6 grid place-items-center gap-3">
+          <div className="flex items-center gap-8 text-white">
+            <button
+              className="h-12 w-12 grid place-items-center rounded-full bg-white/15 border border-white/20 hover:bg-white/25 transition-colors"
+              onClick={() => {
+                const v = videoRef.current;
+                if (!v) return;
+                v.currentTime = Math.max(0, v.currentTime - 5);
+              }}
+              aria-label="Back 5s"
+            >
+              ◀
+            </button>
+
+            <button
+              className="h-16 w-16 grid place-items-center rounded-full bg-white text-black font-bold hover:bg-white/90 transition-colors"
+              onClick={() => {
+                const v = videoRef.current;
+                if (!v) return;
+                v.paused ? v.play() : v.pause();
+              }}
+              aria-label="Play/Pause"
+            >
+              {playing ? "❚❚" : "▶"}
+            </button>
+
+            <button
+              className="h-12 w-12 grid place-items-center rounded-full bg-white/15 border border-white/20 hover:bg-white/25 transition-colors"
+              onClick={() => {
+                const v = videoRef.current;
+                if (!v || !dur) return;
+                v.currentTime = Math.min(dur, v.currentTime + 5);
+              }}
+              aria-label="Forward 5s"
+            >
+              ▶
+            </button>
+          </div>
+
+          {/* See more chevron */}
+          <button className="flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors">
+            <ChevronUp size={16} />
+            <span className="text-[11px] tracking-wide">See More</span>
+          </button>
         </div>
-      </div>
+      </section>
 
       {/* Loading veil when not ready */}
       {!ready && (
