@@ -9,6 +9,7 @@ interface FormFieldProps {
   options?: Array<{ value: string; label: string }>;
   min?: number;
   max?: number;
+  maxLength?: number;
   rows?: number;
   containerClassName?: string;
   required?: boolean;
@@ -23,6 +24,7 @@ export default function FormField({
   options,
   min,
   max,
+  maxLength,
   rows = 3,
   containerClassName = "",
   required = false,
@@ -74,6 +76,7 @@ export default function FormField({
             onChange={(e) => onChange?.(e.target.value)}
             min={min}
             max={max}
+            maxLength={maxLength}
             required={required}
           />
         );
