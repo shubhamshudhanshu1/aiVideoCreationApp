@@ -1,17 +1,58 @@
+"use client";
+
+import { useState } from "react";
 import ActionButtons from "@/components/ActionButtons";
+import ToggleSwitch from "@/components/ToggleSwitch";
 import { Apple, Phone, Mail, Github } from "lucide-react";
 
 export default function Login() {
+  const [loginMethod, setLoginMethod] = useState<"phone" | "email">("phone");
+
+  const handleLogin = () => {
+    if (loginMethod === "phone") {
+      window.location.href = "/login/otp?method=phone";
+    } else {
+      window.location.href = "/login/otp?method=email";
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <h1 className="text-2xl font-semibold mb-6">Login to AI Video</h1>
+
+        {/* Toggle Switch */}
+        <div className="mb-6">
+          <ToggleSwitch
+            leftOption={{
+              label: "Phone",
+              value: "phone",
+              icon: <Phone size={16} />,
+            }}
+            rightOption={{
+              label: "Email",
+              value: "email",
+              icon: <Mail size={16} />,
+            }}
+            value={loginMethod}
+            onChange={(value) => setLoginMethod(value as "phone" | "email")}
+          />
+        </div>
+
         <ActionButtons
           primary={{
-            text: "Use my phone number",
-            icon: <Phone size={16} />,
+            text:
+              loginMethod === "phone"
+                ? "Use my phone number"
+                : "Use my email address",
+            icon:
+              loginMethod === "phone" ? (
+                <Phone size={16} />
+              ) : (
+                <Mail size={16} />
+              ),
             iconPosition: "left",
-            href: "/login/otp",
+            onClick: handleLogin,
             variant: "btn",
             size: "lg",
             width: "full",
