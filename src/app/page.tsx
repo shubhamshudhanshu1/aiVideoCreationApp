@@ -83,7 +83,7 @@ export default function Home() {
             {/* Headline */}
             <div className="text-center mb-6">
               <h1 className="text-4xl font-serif text-white leading-tight mb-2">
-                Make your own music
+                Make your own Video
               </h1>
               <p className="text-white/90 text-lg">
                 Turn your ideas into anthems

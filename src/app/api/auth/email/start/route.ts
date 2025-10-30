@@ -45,21 +45,29 @@ export async function POST(req: Request) {
       },
     });
 
-    // Send email (wrap in try/catch; do not leak failures)
-    try {
-      await sendOtpEmail(e, code);
-      await logAuditEvent("email.start.success", undefined, ip, userAgent, {
-        email: e,
-        otpId: otp.id,
+    // Send email asynchronously to avoid blocking the response
+    sendOtpEmail(e, code)
+      .then(async (result) => {
+        console.log("✅ [EMAIL] Email sent successfully:", result.messageId);
+        await logAuditEvent("email.start.success", undefined, ip, userAgent, {
+          email: e,
+          otpId: otp.id,
+        });
+      })
+      .catch(async (error) => {
+        console.error("❌ [EMAIL] Failed to send email:", error);
+        await logAuditEvent(
+          "email.start.send_failed",
+          undefined,
+          ip,
+          userAgent,
+          {
+            email: e,
+            otpId: otp.id,
+            error: error instanceof Error ? error.message : "Unknown error",
+          }
+        );
       });
-    } catch (error) {
-      await logAuditEvent("email.start.send_failed", undefined, ip, userAgent, {
-        email: e,
-        otpId: otp.id,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      // Don't leak email sending failures to client
-    }
 
     return NextResponse.json({
       otp_id: otp.id,

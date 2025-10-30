@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import FormField from "@/components/FormField";
 import ActionButtons from "@/components/ActionButtons";
 import { CheckCircle, Phone, Mail, ArrowLeft, Loader2 } from "lucide-react";
 import { startOtp, verifyOtp, User } from "@/lib/auth-client";
 
-export default function OTP() {
+function OTPContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const method = searchParams.get("method") || "phone";
@@ -214,5 +214,19 @@ export default function OTP() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function OTP() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <OTPContent />
+    </Suspense>
   );
 }

@@ -73,7 +73,7 @@ export default function Create() {
         <ActionButtons
           primary={{ text: "Generate", variant: "btn" }}
           secondary={[{ text: "Advanced", variant: "chip" }]}
-          className="mt-6"
+          containerClassName="mt-6"
         />
       </div>
 
