@@ -56,22 +56,33 @@ export class DummyVideoGenerator {
     await new Promise((resolve) => setTimeout(resolve, processingTime));
 
     // Generate different video URLs based on aspect ratio
-    // Using reliable, publicly accessible video URLs that actually work
+    // Using reliable, publicly accessible short video URLs that actually work
     const videoUrls = {
       "16:9": [
-        "https://www.w3schools.com/html/mov_bbb.mp4", // Big Buck Bunny (horizontal)
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-white-sand-beach-1176-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-city-traffic-at-night-1289-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4",
       ],
       "9:16": [
-        "https://www.w3schools.com/html/mov_bbb.mp4", // Vertical - use horizontal video (will be cropped)
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "https://sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-white-sand-beach-1176-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-city-traffic-at-night-1289-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4",
       ],
       "1:1": [
-        "https://www.w3schools.com/html/mov_bbb.mp4", // Square - use horizontal video (will be cropped)
         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "https://sample-videos.com/video123/mp4/360/big_buck_bunny_360p_1mb.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-white-sand-beach-1176-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-city-traffic-at-night-1289-large.mp4",
+        "https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4",
       ],
     };
 

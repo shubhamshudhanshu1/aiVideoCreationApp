@@ -51,3 +51,18 @@ export async function copyTo(
   });
   await s3.send(cmd);
 }
+
+export async function uploadBuffer(
+  key: string,
+  buffer: Buffer,
+  contentType = "video/mp4"
+) {
+  const bucket = process.env.R2_BUCKET || process.env.S3_BUCKET!;
+  const cmd = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: buffer,
+    ContentType: contentType,
+  });
+  await s3.send(cmd);
+}
