@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,29 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Visibility {
+  public
+  unlisted
+  private
+}
+
+enum Aspect {
+  RATIO_9X16
+  RATIO_1X1
+  RATIO_16X9
+}
+
+enum JobState {
+  queued
+  generating
+  rendering
+  packaging
+  done
+  failed
+}
+
+enum ReactType {
+  like
+  dislike
+}
+
 model User {
   id            String   @id @default(cuid())
-  email         String   @unique
+  email         String?  @unique
   emailVerified DateTime?
+  phoneHash     String?  @unique
   handle        String   @unique
   displayName   String
   avatarUrl     String?
+  country       String?
+  marketingOptIn Boolean  @default(false)
+  termsAcceptedAt DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  marketingOptIn Boolean @default(false)
-
+  
   sessions      Session[]
+  emailOtps     EmailOtp[]
+  phoneOtps     PhoneOtp[]
+  projects      VideoProject[]
+  comments      Comment[]
+  playlists     Playlist[]
+  follows       Follow[]  @relation("follows_by_me")
+  followers     Follow[]  @relation("follows_of_me")
+  reactions     Reaction[]
+  credits       CreditLedger[]
+  templates     Template[]
 }
 
 model Session {
-  id         String   @id                    // base64url(32)
+  id         String   @id
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   expiresAt  DateTime
   lastSeenAt DateTime @default(now())
   ip         String?
   userAgent  String?
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model EmailOtp {
@@ -44,14 +83,153 @@ model EmailOtp {
   maxAttempts Int      @default(5)
   createdAt   DateTime @default(now())
   consumedAt  DateTime?
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model AuditLog {
+model PhoneOtp {
+  id          String   @id @default(cuid())
+  phoneHash   String
+  codeHash    String
+  expiresAt   DateTime
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(5)
+  createdAt   DateTime @default(now())
+  consumedAt  DateTime?
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VideoProject {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String?
+  prompt       String
+  styles       String[]
+  exclude      String[]
+  durationS    Int
+  aspect       Aspect     @default(RATIO_9X16)
+  voiceoff     Boolean    @default(true)
+  status       String     @default("draft")
+  visibility   Visibility @default(public)
+  modelVersion String
+  seed         Int?
+  allowRemix   Boolean    @default(true)
+  coverUrl     String?
+  hlsUrl       String?
+  mp4Url       String?
+  jobId        String?
+  publishedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  likes        Int        @default(0)
+  dislikes     Int        @default(0)
+  plays        Int        @default(0)
+  
+  comments     Comment[]
+  reactions    Reaction[]
+  playlistItems PlaylistItem[]
+  renderJobs   RenderJob[]
+
+  @@index([userId, createdAt])
+  @@index([status, visibility, publishedAt])
+  @@index([jobId])
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  baseProjectId String
+  name        String
+  tags        String[]
+  isOfficial  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Comment {
   id        String   @id @default(cuid())
-  userId    String?
-  event     String
-  ip        String?
-  userAgent String?
-  meta      Json?
-  at        DateTime @default(now())
+  projectId String
+  project   VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  projectId String
+  project   VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      ReactType
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+}
+
+model Playlist {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  items     PlaylistItem[]
+
+  @@index([userId, createdAt])
+}
+
+model PlaylistItem {
+  playlistId String
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  projectId  String
+  project    VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  order      Int          @default(0)
+
+  @@id([playlistId, projectId])
+}
+
+model Follow {
+  followerId String
+  follower   User @relation("follows_by_me", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User @relation("follows_of_me", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+model CreditLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta        Int
+  reason       String
+  balanceAfter Int
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model RenderJob {
+  id         String   @id @default(cuid())
+  projectId  String
+  project    VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  state      JobState @default(queued)
+  progress   Int      @default(0)
+  retries    Int      @default(0)
+  error      String?
+  workerId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([projectId, createdAt])
 }

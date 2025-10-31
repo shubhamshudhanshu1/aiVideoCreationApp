@@ -34,7 +34,7 @@ services:
   prisma-studio:
     image: node:18-alpine
     working_dir: /workspace
-    command: ["npx", "prisma", "studio", "--port", "5556"]
+    command: sh -c "npx prisma generate && npx prisma studio --port 5556"
     ports:
       - "5556:5556"
     depends_on:
@@ -42,7 +42,7 @@ services:
         condition: service_healthy
     volumes:
       - ./prisma:/workspace/prisma:ro
-      - ./node_modules/.prisma:/workspace/node_modules/.prisma:ro
+      - ./node_modules:/workspace/node_modules
     environment:
       DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
       NODE_TLS_REJECT_UNAUTHORIZED: 0
@@ -62,12 +62,23 @@ services:
       # Route emails to MailHog in dev
       SMTP_HOST: "mailhog"
       SMTP_PORT: 1025
+      SMTP_USER: ""
+      SMTP_PASS: ""
       MAIL_FROM: "no-reply@ai-video-app.com"
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       PRISMA_ENGINES_CHECKSUM_IGNORE: 1
       PRISMA_CLI_NO_ENGINE_CHECK: 1
       # Video generation settings
       USE_MOCK_VIDEO: "true"
+      # Auth & Security
+      JWT_SECRET: "replace_me_dev_secret_key_change_in_production"
+      # Cloudflare R2 Storage
+      R2_ENDPOINT: "https://c5f48a82dab81ee223aa84f4b9917291.r2.cloudflarestorage.com"
+      R2_REGION: "auto"
+      R2_BUCKET: "your-bucket-name"
+      R2_PUBLIC_BASE: "https://your-custom-domain.com"
+      R2_ACCESS_KEY_ID: "your_r2_access_key_id"
+      R2_SECRET_ACCESS_KEY: "your_r2_secret_access_key"
     ports:
       - "3000:3000"
     volumes:
@@ -98,6 +109,15 @@ services:
       MAIL_FROM: "no-reply@ai-video-app.com"
       # Video generation settings
       USE_MOCK_VIDEO: "true"
+      # Auth & Security
+      JWT_SECRET: "replace_me_production_secret_key_change_this"
+      # Cloudflare R2 Storage
+      R2_ENDPOINT: "https://c5f48a82dab81ee223aa84f4b9917291.r2.cloudflarestorage.com"
+      R2_REGION: "auto"
+      R2_BUCKET: "your-bucket-name"
+      R2_PUBLIC_BASE: "https://your-custom-domain.com"
+      R2_ACCESS_KEY_ID: "your_r2_access_key_id"
+      R2_SECRET_ACCESS_KEY: "your_r2_secret_access_key"
     ports:
       - "3000:3000"
     depends_on:

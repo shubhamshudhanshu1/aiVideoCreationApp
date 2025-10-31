@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { sha256, now, createSession } from "@/lib/auth";
-import { EmailVerify } from "@/lib/z";
+import { PhoneVerify } from "@/lib/z";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { otp_id, code, handle } = EmailVerify.parse(body);
+    const { otp_id, code, handle } = PhoneVerify.parse(body);
 
-    const otp = await prisma.emailOtp.findUnique({
+    const otp = await prisma.phoneOtp.findUnique({
       where: { id: otp_id },
     });
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const codeHash = sha256(code);
     if (codeHash !== otp.codeHash) {
-      await prisma.emailOtp.update({
+      await prisma.phoneOtp.update({
         where: { id: otp_id },
         data: { attempts: { increment: 1 } },
       });
@@ -39,34 +39,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Mark OTP as consumed
-    await prisma.emailOtp.update({
+    await prisma.phoneOtp.update({
       where: { id: otp_id },
       data: { consumedAt: now() },
     });
 
-    const emailLower = otp.email.trim().toLowerCase();
-
     // Upsert user
     let user = await prisma.user.findUnique({
-      where: { email: emailLower },
+      where: { phoneHash: otp.phoneHash },
     });
 
     if (!user) {
-      const handleValue =
-        handle || `user_${otp_id.slice(-6)}`;
+      const handleValue = handle || `user_${otp_id.slice(-6)}`;
       
       user = await prisma.user.create({
         data: {
-          email: emailLower,
-          emailVerified: now(),
+          phoneHash: otp.phoneHash,
           handle: handleValue,
           displayName: handleValue,
         },
-      });
-    } else if (!user.emailVerified) {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: { emailVerified: now() },
       });
     }
 
@@ -90,16 +81,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       user: {
         id: user.id,
-        email: user.email,
         handle: user.handle,
         displayName: user.displayName,
       },
     });
   } catch (error: any) {
-    console.error("Email OTP verify error:", error);
+    console.error("Phone OTP verify error:", error);
     if (error.issues) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
+

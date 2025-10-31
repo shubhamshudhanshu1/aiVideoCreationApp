@@ -54,7 +54,7 @@ LABEL org.opencontainers.image.authors="YOU <your@email.com>"
 
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init ca-certificates
+RUN apk add --no-cache dumb-init ca-certificates wget
 
 # Create non-root user
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -G appgroup -u 1001
@@ -66,7 +66,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src ./src
-COPY --from=builder /app/EMAIL_OTP_SETUP.md ./EMAIL_OTP_SETUP.md
 # Ensure the non-root user owns the app directory (needed for Prisma engines write at runtime)
 RUN chown -R appuser:appgroup /app
 
