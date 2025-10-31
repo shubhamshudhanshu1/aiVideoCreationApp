@@ -1,7 +1,10 @@
+# Tip: Use the 'development' stage for local dev with Compose: 
+# docker-compose up app-dev
+
 # ---- Base Node ----
 FROM node:18-alpine AS base
 
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init ca-certificates
 
 WORKDIR /app
 
@@ -9,19 +12,40 @@ WORKDIR /app
 COPY package.json yarn.lock package-lock.json ./
 
 # Install dependencies (handle both Yarn and npm users)
-RUN if [ -f yarn.lock ]; then yarn install --frozen-lockfile --production=false; else npm install --omit=dev; fi
+# Prefer npm if package-lock.json exists; fallback to yarn only if no npm lockfile
+RUN if [ -f package-lock.json ]; then \
+      npm ci; \
+    elif [ -f yarn.lock ]; then \
+      corepack enable && yarn install --frozen-lockfile; \
+    else \
+      npm install; \
+    fi
 
 # Copy only schema for Prisma generate
 COPY prisma ./prisma
-RUN if [ -f yarn.lock ]; then yarn run prisma generate; else npx prisma generate; fi
+# Do not run prisma generate at build time to avoid CA/proxy issues
 
 # Copy the code
 COPY . ./
 
+# ---- Development ----
+FROM base AS development
+ENV NODE_ENV=development
+EXPOSE 3000
+RUN addgroup -g 1001 -S appgroup && adduser -S appuser -G appgroup -u 1001
+# Generate Prisma client as root, then fix ownership for non-root runtime
+RUN NODE_TLS_REJECT_UNAUTHORIZED=0 PRISMA_ENGINES_CHECKSUM_IGNORE=1 npx prisma generate
+RUN chown -R appuser:appgroup /app
+USER appuser
+ENTRYPOINT ["dumb-init", "--"]
+CMD [ "npx", "next", "dev" ]
+
 # ---- Build ----
 FROM base AS builder
 ENV NODE_ENV=production
-RUN if [ -f yarn.lock ]; then yarn build; else npm run build; fi
+# Generate Prisma client during build
+RUN NODE_TLS_REJECT_UNAUTHORIZED=0 PRISMA_ENGINES_CHECKSUM_IGNORE=1 npx prisma generate
+RUN if [ -f package-lock.json ]; then npm run build; else yarn build; fi
 
 # ---- Production ----
 FROM node:18-alpine AS runner
@@ -30,7 +54,7 @@ LABEL org.opencontainers.image.authors="YOU <your@email.com>"
 
 WORKDIR /app
 
-RUN apk add --no-cache dumb-init
+RUN apk add --no-cache dumb-init ca-certificates
 
 # Create non-root user
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -G appgroup -u 1001
@@ -43,6 +67,8 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/EMAIL_OTP_SETUP.md ./EMAIL_OTP_SETUP.md
+# Ensure the non-root user owns the app directory (needed for Prisma engines write at runtime)
+RUN chown -R appuser:appgroup /app
 
 # For Prisma/Production migration (optional, for non-SQLite)
 # COPY --from=builder /app/prisma ./prisma

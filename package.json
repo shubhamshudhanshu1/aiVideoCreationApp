@@ -13,7 +13,15 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "docker:dev": "docker-compose up app-dev prisma-studio",
+    "docker:dev:detached": "docker-compose up -d app-dev prisma-studio",
+    "docker:dev:down": "docker-compose down",
+    "docker:prod": "docker-compose up --build app",
+    "docker:prod:detached": "docker-compose up --build -d app",
+    "docker:prod:down": "docker-compose down",
+    "docker:studio": "docker-compose up prisma-studio",
+    "docker:studio:detached": "docker-compose up -d prisma-studio"
   },
   "dependencies": {
     "@prisma/client": "^6.18.0",

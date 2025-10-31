@@ -18,6 +18,52 @@ services:
     ports:
       - "5432:5432"
 
+  prisma-studio:
+    image: node:18-alpine
+    working_dir: /workspace
+    command: ["npx", "prisma", "studio", "--port", "5556"]
+    ports:
+      - "5556:5556"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./prisma:/workspace/prisma:ro
+      - ./node_modules/.prisma:/workspace/node_modules/.prisma:ro
+    environment:
+      DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      PRISMA_ENGINES_CHECKSUM_IGNORE: 1
+      PRISMA_CLI_NO_ENGINE_CHECK: 1
+
+  app-dev:
+    build:
+      context: .
+      target: development
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_PORT: 587
+      SMTP_USER: "your-email@gmail.com"
+      SMTP_PASS: "your-app-password"
+      MAIL_FROM: "no-reply@ai-video-app.com"
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      PRISMA_ENGINES_CHECKSUM_IGNORE: 1
+      PRISMA_CLI_NO_ENGINE_CHECK: 1
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./public:/app/public
+      - ./EMAIL_OTP_SETUP.md:/app/EMAIL_OTP_SETUP.md:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
   app:
     build: .
     restart: unless-stopped
@@ -25,16 +71,26 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
-      # SMTP_*, MAIL_FROM, and other vars should be set here or in .env
-    env_file:
-      - .env
+      SMTP_HOST: "smtp.gmail.com"
+      SMTP_PORT: 587
+      SMTP_USER: "your-email@gmail.com"
+      SMTP_PASS: "your-app-password"
+      MAIL_FROM: "no-reply@ai-video-app.com"
     ports:
       - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000" ]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
