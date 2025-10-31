@@ -66,6 +66,8 @@ services:
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       PRISMA_ENGINES_CHECKSUM_IGNORE: 1
       PRISMA_CLI_NO_ENGINE_CHECK: 1
+      # Video generation settings
+      USE_MOCK_VIDEO: "true"
     ports:
       - "3000:3000"
     volumes:
@@ -94,6 +96,8 @@ services:
       SMTP_USER: "your-email@gmail.com"
       SMTP_PASS: "your-app-password"
       MAIL_FROM: "no-reply@ai-video-app.com"
+      # Video generation settings
+      USE_MOCK_VIDEO: "true"
     ports:
       - "3000:3000"
     depends_on:
