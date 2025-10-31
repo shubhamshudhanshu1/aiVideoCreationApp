@@ -16,7 +16,20 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5434:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
 
   prisma-studio:
     image: node:18-alpine
@@ -45,10 +58,10 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
-      SMTP_HOST: "smtp.gmail.com"
-      SMTP_PORT: 587
-      SMTP_USER: "your-email@gmail.com"
-      SMTP_PASS: "your-app-password"
+      REDIS_URL: "redis://redis:6379"
+      # Route emails to MailHog in dev
+      SMTP_HOST: "mailhog"
+      SMTP_PORT: 1025
       MAIL_FROM: "no-reply@ai-video-app.com"
       NODE_TLS_REJECT_UNAUTHORIZED: 0
       PRISMA_ENGINES_CHECKSUM_IGNORE: 1
@@ -63,6 +76,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
+      mailhog:
+        condition: service_started
 
   app:
     build: .
@@ -71,6 +88,7 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: "postgresql://user:password@db:5432/ai_video_app?schema=public"
+      REDIS_URL: "redis://redis:6379"
       SMTP_HOST: "smtp.gmail.com"
       SMTP_PORT: 587
       SMTP_USER: "your-email@gmail.com"
@@ -81,6 +99,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
     healthcheck:
       test:
         [

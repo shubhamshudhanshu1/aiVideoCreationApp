@@ -14,7 +14,7 @@ COPY package.json yarn.lock package-lock.json ./
 # Install dependencies (handle both Yarn and npm users)
 # Prefer npm if package-lock.json exists; fallback to yarn only if no npm lockfile
 RUN if [ -f package-lock.json ]; then \
-      npm ci; \
+      npm install; \
     elif [ -f yarn.lock ]; then \
       corepack enable && yarn install --frozen-lockfile; \
     else \
