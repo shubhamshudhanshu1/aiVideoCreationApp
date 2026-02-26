@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import FormField from "@/components/FormField";
 import VideoCard from "@/components/VideoCard";
 import ActionButtons from "@/components/ActionButtons";
@@ -16,6 +16,12 @@ interface GeneratedVideo {
   generatedAt: string;
 }
 
+interface ConsoleEntry {
+  time: string;
+  message: string;
+  type: "info" | "success" | "error";
+}
+
 export default function Create() {
   const [styles, setStyles] = useState<string[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -27,6 +33,17 @@ export default function Create() {
     null
   );
   const [error, setError] = useState<string | null>(null);
+  const [consoleLogs, setConsoleLogs] = useState<ConsoleEntry[]>([]);
+  const consoleEndRef = useRef<HTMLDivElement>(null);
+
+  const log = useCallback((message: string, type: ConsoleEntry["type"] = "info") => {
+    const time = new Date().toLocaleTimeString("en-US", { hour12: false });
+    setConsoleLogs((prev) => {
+      const next = [...prev, { time, message, type }];
+      return next.slice(-50); // keep last 50 entries
+    });
+    setTimeout(() => consoleEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+  }, []);
 
   const toggle = (s: string) =>
     setStyles((prev) =>
@@ -41,8 +58,12 @@ export default function Create() {
 
     setIsGenerating(true);
     setError(null);
+    log("Starting video generation...");
+    log(`Prompt: "${prompt.trim()}"`);
+    log(`Settings → duration: ${duration}s | ratio: ${aspectRatio} | styles: ${styles.length ? styles.join(", ") : "none"}`);
 
     try {
+      log("Sending request to /api/video/generate");
       const response = await fetch("/api/video/generate", {
         method: "POST",
         headers: {
@@ -57,6 +78,7 @@ export default function Create() {
         }),
       });
 
+      log(`Server responded with status ${response.status}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -64,16 +86,25 @@ export default function Create() {
       }
 
       if (data.success && data.video) {
+        log("Video generated successfully.", "success");
         setGeneratedVideo(data.video);
       } else {
         throw new Error("Invalid response from server");
       }
     } catch (err: any) {
       console.error("Generation error:", err);
+      log(`Error: ${err.message}`, "error");
       setError(err.message || "Failed to generate video. Please try again.");
     } finally {
       setIsGenerating(false);
+      log("Done.");
     }
+  };
+
+  const logColor = (type: ConsoleEntry["type"]) => {
+    if (type === "success") return "text-green-400";
+    if (type === "error") return "text-red-400";
+    return "text-gray-300";
   };
 
   return (
@@ -213,6 +244,43 @@ export default function Create() {
         ) : (
           <VideoCard id="preview" title="Preview" variant="preview" />
         )}
+      </div>
+
+      {/* Console panel — spans full width */}
+      <div className="sm:col-span-2">
+        <div className="rounded-lg overflow-hidden border border-gray-700 bg-[#1a1a1e]">
+          {/* title bar */}
+          <div className="flex items-center justify-between px-4 py-2 bg-[#111114] border-b border-gray-700">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-red-500" />
+              <span className="w-3 h-3 rounded-full bg-yellow-400" />
+              <span className="w-3 h-3 rounded-full bg-green-500" />
+            </div>
+            <span className="text-xs text-gray-500 font-mono">console</span>
+            <button
+              onClick={() => setConsoleLogs([])}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              clear
+            </button>
+          </div>
+          {/* log output */}
+          <div className="h-36 overflow-y-auto p-3 font-mono text-xs leading-relaxed">
+            {consoleLogs.length === 0 ? (
+              <span className="text-gray-600">
+                Waiting for activity... Press &quot;Generate&quot; to start.
+              </span>
+            ) : (
+              consoleLogs.map((entry, i) => (
+                <div key={i} className="flex gap-2">
+                  <span className="text-gray-600 shrink-0">{entry.time}</span>
+                  <span className={logColor(entry.type)}>{entry.message}</span>
+                </div>
+              ))
+            )}
+            <div ref={consoleEndRef} />
+          </div>
+        </div>
       </div>
     </div>
   );
